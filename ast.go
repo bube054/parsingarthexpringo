@@ -1,5 +1,7 @@
 package parsingarthexpringo
 
+import "fmt"
+
 type NodeKind int
 
 const (
@@ -10,6 +12,7 @@ const (
 type Node interface {
 	NodeKind() NodeKind
 	Equals(Node) bool
+	fmt.Stringer
 }
 
 type Operand struct {
@@ -32,6 +35,10 @@ func (n *Operand) Equals(other Node) bool {
 		return false
 	}
 	return n.Token.Equal(&o.Token)
+}
+
+func (o *Operand) String() string {
+	return fmt.Sprintf("Operand{%s}", o.Token)
 }
 
 type BinaryExpr struct {
@@ -72,7 +79,33 @@ func (b *BinaryExpr) Equals(other Node) bool {
 	return leftEq && rightEq
 }
 
+func (b *BinaryExpr) String() string {
+	return fmt.Sprintf("(%s %s %s)", b.Left, b.Operator, b.Right)
+}
+
+
 func asOperand(v any) (Operand, bool) {
 	n, ok := v.(Operand)
 	return n, ok
+}
+
+func asOperator(v any) (Operand, bool) {
+	n, ok := v.(Operand)
+	return n, ok
+}
+
+func asNode(v any) (Node, bool) {
+	n, ok := v.(Node)
+	return n, ok
+}
+
+func asNodeV2(v any) (Node, bool) {
+	switch x := v.(type) {
+	case Node:
+		return x, true
+	case Token:
+		return NewOperand(x.Kind, x.Value), true
+	default:
+		return nil, false
+	}
 }

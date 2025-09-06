@@ -17,7 +17,7 @@ const (
 	SUB
 	DIV
 	MUL
-	EXP
+	POW
 	LBRACKET
 	RBRACKET
 	ILLEGAL
@@ -37,8 +37,8 @@ func (tk TokenKind) String() string {
 		return "DIV"
 	case MUL:
 		return "MUL"
-	case EXP:
-		return "EXP"
+	case POW:
+		return "POW"
 	case LBRACKET:
 		return "LBRACKET"
 	case RBRACKET:
@@ -59,11 +59,26 @@ const (
 	CATEGORY_ILLEGAL
 )
 
+func (tc TokenCategory) String() string {
+	switch tc {
+	case CATEGORY_VALUE:
+		return "VALUE"
+	case CATEGORY_OPERATOR:
+		return "OPERATOR"
+	case CATEGORY_PAREN:
+		return "PAREN"
+	case CATEGORY_ILLEGAL:
+		return "ILLEGAL"
+	default:
+		return fmt.Sprintf("TokenCategory(%d)", int(tc))
+	}
+}
+
 func categorize(kind TokenKind) TokenCategory {
 	switch kind {
 	case NUM, ALPHA:
 		return CATEGORY_VALUE
-	case ADD, SUB, MUL, DIV, EXP:
+	case ADD, SUB, MUL, DIV, POW:
 		return CATEGORY_OPERATOR
 	case LBRACKET, RBRACKET:
 		return CATEGORY_PAREN
@@ -84,6 +99,22 @@ func NewToken(kind TokenKind, value string) Token {
 		Value:    value,
 		Category: categorize(kind),
 	}
+}
+
+func (t *Token) Equal(other *Token) bool {
+	if t == nil && other == nil {
+		return true
+	}
+	if t == nil || other == nil {
+		return false
+	}
+	return t.Kind == other.Kind &&
+		t.Value == other.Value &&
+		t.Category == other.Category
+}
+
+func (t Token) String() string {
+	return fmt.Sprintf("Token{Kind: %s, Value: %q, Category: %s}", t.Kind, t.Value, t.Category)
 }
 
 type Tokens []Token
@@ -110,17 +141,22 @@ func (tks *Tokens) Equal(other *Tokens) bool {
 	return true
 }
 
-func (t *Token) Equal(other *Token) bool {
-	if t == nil && other == nil {
-		return true
+func (tks Tokens) String() string {
+	if len(tks) == 0 {
+		return "[]"
 	}
-	if t == nil || other == nil {
-		return false
+
+	out := "["
+	for i, t := range tks {
+		if i > 0 {
+			out += ", "
+		}
+		out += t.String()
 	}
-	return t.Kind == other.Kind &&
-		t.Value == other.Value &&
-		t.Category == other.Category
+	out += "]"
+	return out
 }
+
 
 func Lexer(input string) Tokens {
 	scanner := bufio.NewScanner(strings.NewReader(input))
@@ -140,7 +176,7 @@ func Lexer(input string) Tokens {
 		case "/":
 			tokens.Push(NewToken(DIV, text))
 		case "^":
-			tokens.Push(NewToken(EXP, text))
+			tokens.Push(NewToken(POW, text))
 		case "(":
 			tokens.Push(NewToken(LBRACKET, text))
 		case ")":
@@ -178,3 +214,7 @@ func IsNumber(s string) bool {
 	return err == nil
 }
 
+func asToken(v any) (Token, bool) {
+	t, ok := v.(Token)
+	return t, ok
+}

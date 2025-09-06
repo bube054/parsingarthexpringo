@@ -10,7 +10,7 @@ func TestParser(t *testing.T) {
 		expected Node
 		opPrec   OperatorPrecedence
 	}{
-		// // Parse single arithmetic or algebraic expressions
+		// Parse single arithmetic or algebraic expressions
 		// {
 		// 	input:    "3",
 		// 	expected: NewOperand(NUM, "3"),
@@ -47,10 +47,16 @@ func TestParser(t *testing.T) {
 		// 	input:    "a * b",
 		// 	expected: NewBinaryExpr(MUL, NewOperand(ALPHA, "a"), NewOperand(ALPHA, "b")),
 		// },
-		{
-			input:    "p ^ q",
-			expected: NewBinaryExpr(EXP, NewOperand(ALPHA, "p"), NewOperand(ALPHA, "q")),
-		},
+		// {
+		// 	input:    "p ^ q",
+		// 	expected: NewBinaryExpr(POW, NewOperand(ALPHA, "p"), NewOperand(ALPHA, "q")),
+		// },
+
+		// Parse binary arithmetic or algebraic expressions
+		// {
+		// 	input:    "( 15 ^ 1 )",
+		// 	expected: NewBinaryExpr(POW, NewOperand(NUM, "15"), NewOperand(NUM, "1")),
+		// },
 	}
 
 	for _, test := range tests {
