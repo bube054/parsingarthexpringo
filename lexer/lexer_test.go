@@ -1,4 +1,4 @@
-package parsingarthexpringo
+package lexer
 
 import (
 	"reflect"

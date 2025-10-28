@@ -1,4 +1,4 @@
-package parsingarthexpringo
+package lexer
 
 import (
 	"bufio"
@@ -157,7 +157,6 @@ func (tks Tokens) String() string {
 	return out
 }
 
-
 func Lexer(input string) Tokens {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	scanner.Split(bufio.ScanWords)
@@ -214,7 +213,7 @@ func IsNumber(s string) bool {
 	return err == nil
 }
 
-func asToken(v any) (Token, bool) {
+func AsToken(v any) (Token, bool) {
 	t, ok := v.(Token)
 	return t, ok
 }

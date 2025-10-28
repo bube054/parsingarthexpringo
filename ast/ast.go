@@ -1,6 +1,10 @@
-package parsingarthexpringo
+package ast
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bube054/parsingarthexpringo/lexer"
+)
 
 type NodeKind int
 
@@ -16,12 +20,12 @@ type Node interface {
 }
 
 type Operand struct {
-	Token Token
+	Token lexer.Token
 }
 
-func NewOperand(kind TokenKind, value string) *Operand {
+func NewOperand(kind lexer.TokenKind, value string) *Operand {
 	return &Operand{
-		Token: NewToken(kind, value),
+		Token: lexer.NewToken(kind, value),
 	}
 }
 
@@ -42,12 +46,12 @@ func (o *Operand) String() string {
 }
 
 type BinaryExpr struct {
-	Operator TokenKind
+	Operator lexer.TokenKind
 	Left     Node
 	Right    Node
 }
 
-func NewBinaryExpr(operator TokenKind, left Node, right Node) *BinaryExpr {
+func NewBinaryExpr(operator lexer.TokenKind, left Node, right Node) *BinaryExpr {
 	return &BinaryExpr{
 		Operator: operator,
 		Left:     left,
@@ -83,27 +87,26 @@ func (b *BinaryExpr) String() string {
 	return fmt.Sprintf("(%s %s %s)", b.Left, b.Operator, b.Right)
 }
 
-
-func asOperand(v any) (Operand, bool) {
+func AsOperand(v any) (Operand, bool) {
 	n, ok := v.(Operand)
 	return n, ok
 }
 
-func asOperator(v any) (Operand, bool) {
+func AsOperator(v any) (Operand, bool) {
 	n, ok := v.(Operand)
 	return n, ok
 }
 
-func asNode(v any) (Node, bool) {
+func AsNode(v any) (Node, bool) {
 	n, ok := v.(Node)
 	return n, ok
 }
 
-func asNodeV2(v any) (Node, bool) {
+func AsNodeV2(v any) (Node, bool) {
 	switch x := v.(type) {
 	case Node:
 		return x, true
-	case Token:
+	case lexer.Token:
 		return NewOperand(x.Kind, x.Value), true
 	default:
 		return nil, false
